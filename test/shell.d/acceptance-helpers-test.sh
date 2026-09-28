@@ -68,3 +68,12 @@ contains_out=$(PATH="$grim_fail:$PATH" screen_contains "Hello" 2>&1) &&
 grep -q 'grim failed' <<<"$contains_out" ||
   fail "screen_contains does not name a capture failure" "$contains_out"
 pass "screen_contains names a grim failure instead of missing text"
+
+wait_out=$(set -e; PATH="$grim_fail:$PATH" wait_until "probe text is visible" 0 screen_contains "Hello" 2>&1)
+wait_status=$?
+((wait_status)) || fail "wait_until passes when grim fails" "$wait_out"
+grep -q 'grim failed' <<<"$wait_out" ||
+  fail "wait_until hides the grim failure behind its timeout" "$wait_out"
+grep -q 'not ok - probe text is visible' <<<"$wait_out" ||
+  fail "a failed failure screenshot cuts off the step that failed" "$wait_out"
+pass "wait_until times out naming the grim failure and the step"

@@ -23,7 +23,7 @@ fail() {
   step=${step//[^a-z0-9-]/}
 
   [[ -n $detail ]] && printf '%s\n' "$detail" >&2
-  screenshot "failure-$step"
+  screenshot "failure-$step" || true
   printf 'not ok - %s\n' "$description" >&2
   exit 1
 }
@@ -55,11 +55,11 @@ wait_until() {
   local description="$1" timeout="$2"
   shift 2
 
-  local deadline=$((SECONDS + timeout))
+  local deadline=$((SECONDS + timeout)) error
 
-  until "$@" >/dev/null 2>&1; do
+  until error=$("$@" 2>&1 >/dev/null); do
     if ((SECONDS >= deadline)); then
-      fail "$description" "timed out after ${timeout}s waiting for: $*"
+      fail "$description" "timed out after ${timeout}s waiting for: $*${error:+$'\n'$error}"
     fi
     sleep 1
   done
