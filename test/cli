@@ -204,8 +204,8 @@ if [[ $output == *"apply"* ]]; then
 fi
 pass "a group whose commands are all hidden stays out of the top-level listing"
 
-# GROUP_DESCRIPTIONS is what --help prints. A leftover entry for a prefix that
-# no longer has any binaries advertises a group that then 127s.
+# GROUP_DESCRIPTIONS is what --help prints. An entry for a prefix with no visible
+# commands advertises a group that 127s or lists nothing.
 if ! CLI="$CLI" python3 <<'PY'
 import json
 import os
@@ -228,20 +228,20 @@ for line in help_text.splitlines():
     if match:
       advertised.append(match.group(1))
 
-commands = json.loads(subprocess.check_output([cli, "commands", "--all", "--json"], text=True))["commands"]
+commands = json.loads(subprocess.check_output([cli, "commands", "--json"], text=True))["commands"]
 groups_with_commands = {command["group"] for command in commands}
 empty = [group for group in advertised if group not in groups_with_commands]
 if empty:
-  print("advertised groups with no commands: " + " ".join(empty), file=sys.stderr)
+  print("advertised groups with no visible commands: " + " ".join(empty), file=sys.stderr)
   sys.exit(1)
 if not advertised:
   print("parsed no groups from --help", file=sys.stderr)
   sys.exit(1)
 PY
 then
-  fail "advertised help groups all have commands"
+  fail "advertised help groups all have visible commands"
 fi
-pass "advertised help groups all have commands"
+pass "advertised help groups all have visible commands"
 
 for internal in omarchy-apply-system omarchy-apply-hardware omarchy-apply-lock; do
   if "$CLI" commands --json | jq -e --arg binary "$internal" \
