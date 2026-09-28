@@ -20,7 +20,7 @@ cat >"$TMPDIR/bin/pgrep" <<'SH'
 [[ $1 == -x && ( $2 == ghostty || $2 == foot ) ]]
 SH
 
-for command in omarchy-notification-send omarchy-restart-shell omarchy-hook; do
+for command in omarchy-notification-send omarchy-restart-shell omarchy-hook pkill; do
   cat >"$TMPDIR/bin/$command" <<'SH'
 #!/bin/bash
 printf '%s %s\n' "${0##*/}" "$*" >>"$FAKE_CALLS"
