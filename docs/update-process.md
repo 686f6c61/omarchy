@@ -253,7 +253,7 @@ the runtime to a git checkout via the dev-link mechanism, after which
 `omarchy update` fast-forwards that checkout instead of upgrading a package.
 
 There is no version file at runtime. `omarchy-version` derives the version from
-`pacman -Q` on whichever package is installed, or reports `dev (<hash>)` for a
+the pacman local database entry of whichever package is installed, or reports `dev (<hash>)` for a
 linked checkout, and `omarchy-version-channel` sniffs the mirrorlist and
 pacman.conf to answer which channel is active.
 
